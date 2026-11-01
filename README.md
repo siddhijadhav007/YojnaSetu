@@ -1,538 +1,319 @@
-# 🇮🇳 YojnaSetu.ai – Scheme Finder That Finds You
+# 🇮🇳 YojnaSetu.AI — Connecting Citizens with Government Schemes
 
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
-[![Flask 3.1](https://img.shields.io/badge/framework-Flask%203.1-black.svg)](https://flask.palletsprojects.com/)
-[![Scikit-Learn](https://img.shields.io/badge/ML-Scikit--Learn-orange.svg)](https://scikit-learn.org/)
-[![SQLAlchemy 2.0](https://img.shields.io/badge/ORM-SQLAlchemy%202.0-red.svg)](https://www.sqlalchemy.org/)
-[![PostgreSQL](https://img.shields.io/badge/database-PostgreSQL%20%7C%20SQLite-336791.svg)](https://www.postgresql.org/)
-[![Tests](https://img.shields.io/badge/tests-17%20passed-brightgreen.svg)](tests/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+**YojnaSetu.AI** is an AI-powered, multilingual government scheme discovery platform designed to bridge the gap between Indian citizens and government welfare schemes.
 
-**YojnaSetu.ai** is an intelligent, privacy-first civic-tech platform that connects Indian citizens with over 450+ Central, State, and Private welfare schemes. By combining a 6-step guided questionnaire with a hybrid Machine Learning recommendation engine (TF-IDF + Random Forest Classifier) and deterministic eligibility verification, YojnaSetu eliminates government bureaucracy and paperwork confusion—requiring no sensitive identity documents (such as Aadhaar or PAN) to explore matching benefits.
+The platform collects basic information through a guided questionnaire and uses a hybrid Machine Learning and rule-based recommendation engine to identify potentially relevant government schemes.
+
+Its primary objective is simple:
+
+**Help every eligible citizen discover government schemes without complicated searches, registration, or unnecessary paperwork.**
 
 ---
 
-## 📑 Table of Contents
+## 1. Project Overview
 
-- [Key Features](#-key-features)
-- [System Architecture](#-system-architecture)
-- [Repository Structure](#-repository-structure)
-- [Technology Stack](#-technology-stack)
-- [Quick Start Guide](#-quick-start-guide)
-  - [Prerequisites](#prerequisites)
-  - [Local Installation](#local-installation)
-  - [Running the Server](#running-the-server)
-- [Docker & PostgreSQL Deployment](#-docker--postgresql-deployment)
-- [REST API Reference](#-rest-api-reference)
-- [Machine Learning & Scoring Pipeline](#-machine-learning--scoring-pipeline)
-- [Database Schema](#-database-schema)
-- [Automated Testing & Validation](#-automated-testing--validation)
-- [Environment Configuration](#-environment-configuration)
-- [Contributing & License](#-contributing--license)
+YojnaSetu.AI acts as a bridge between citizens and government welfare schemes.
+
+Citizens provide basic information through a questionnaire. The system analyzes their responses, evaluates scheme eligibility criteria, and presents relevant government schemes with useful information.
+
+### Core Principles
+
+- No citizen registration or login.
+- No permanent citizen profiles.
+- Temporary, session-based information handling.
+- AI and ML-based scheme recommendations.
+- Multilingual accessibility.
+- Transparent eligibility evaluation.
+- Simple and accessible user experience.
 
 ---
 
-## 🌟 Key Features
+## 2. Key Features
 
-- **Personalized Multi-Criteria Matching**: Evaluates age brackets, gender, annual income, social category (General, OBC, SC, ST, EWS, Minority), state of residence, and occupation across 459 curated government welfare schemes.
-- **Hybrid AI & ML Scoring**: Combines hard boundary eligibility checks (age/income/state) with TF-IDF cosine similarity and Random Forest categorization to produce composite match scores (40–99/100).
-- **Comprehensive Scheme Metadata**: Returns detailed scheme descriptions, benefit amounts, required document checklists, application links, and transparent "Score Breakdown" reasons.
-- **Multilingual Support**: Header language selector supporting 13 official Indian languages (English, Hindi, Marathi, Gujarati, Tamil, Telugu, Kannada, Malayalam, Bengali, Punjabi, Odia, Assamese, Urdu).
-- **Authentication & Secure Bookmarking**: OTP verification (phone and email) with HMAC-signed session tokens and persistent bookmarking of favorite schemes.
-- **Dual Database Flexibility**: Native PostgreSQL support for production deployments, with zero-configuration fallback to SQLite for local development.
-- **Integrated AI Assistant**: In-app conversational assistant explaining benefits, eligibility, and step-by-step application procedures for any matched scheme.
-- **Production-Ready**: Includes Waitress WSGI runner, Docker multi-stage containerization, Docker Compose with PostgreSQL 16 Alpine, and a 17-test Pytest suite.
+### 2.1 Smart Citizen Questionnaire
+Collect basic information required to identify relevant government schemes, such as:
 
----
+- Age
+- Gender
+- State
+- Annual family income
+- Social category
+- Occupation
+- Education and other relevant eligibility information
 
-## 🏛 System Architecture
+### 2.2 ML-Based Recommendation Engine
 
-```mermaid
-graph TD
-    subgraph Frontend["Frontend Client (HTML5 / Tailwind CSS / Vanilla JS)"]
-        UI["Landing Page & Questionnaire"]
-        AuthUI["Phone / Email OTP Authentication"]
-        Cards["Scheme Cards with Filter Tabs"]
-        AI_Chat["YojnaSetu AI Assistant"]
-    end
+A hybrid recommendation engine combines:
 
-    subgraph API_Gateway["Flask Application Layer (backend/yojnasetu_api.py)"]
-        Routes["REST Endpoints (/api/recommend, /api/schemes, /api/auth)"]
-        Security["Security Headers (nosniff, SAMEORIGIN, XSS-Protection)"]
-        TokenAuth["Cryptographic HMAC Session Tokens"]
-    end
+- Rule-based eligibility verification.
+- Machine Learning classification.
+- TF-IDF-based text similarity.
+- Scheme relevance scoring.
 
-    subgraph Intelligence["ML & Recommendation Engine (backend/yojna_setu_ai_interactive.py)"]
-        Predictor["YojnaSetuAIPredictor"]
-        Rules["Deterministic Boundary Checker"]
-        TFIDF["TF-IDF Vectorizer & Cosine Similarity"]
-        RF["Random Forest Classifier (81.5% Acc)"]
-    end
+The engine evaluates questionnaire responses against available scheme information to identify potentially matching schemes.
 
-    subgraph Data_Layer["Data & Persistence (backend/database.py)"]
-        SQLAlchemy["SQLAlchemy 2.0 ORM"]
-        Postgres[("PostgreSQL 16 (Production)")]
-        SQLite[("SQLite Fallback (Development)")]
-        ExcelDataset[("459 Schemes Dataset (data/yojna_setu_ai_cleaned.xlsx)")]
-    end
+### 2.3 Government Scheme Information
 
-    UI -->|JSON HTTP POST| Routes
-    AuthUI -->|OTP Auth| TokenAuth
-    Routes --> Predictor
-    Predictor --> Rules
-    Predictor --> TFIDF
-    Predictor --> RF
-    Predictor --> ExcelDataset
-    Routes --> SQLAlchemy
-    SQLAlchemy --> Postgres
-    SQLAlchemy --> SQLite
-    Cards <---|Ranked Recommendations| Routes
-    AI_Chat <---|Contextual Scheme Insights| UI
-```
+Display relevant information for each recommended scheme:
+
+- Scheme name
+- Scheme description
+- Eligibility requirements
+- Benefits
+- Required documents
+- Application procedure
+- Official application link
+
+### 2.4 Multilingual Support
+
+The platform supports 10 Indian languages as specified in the current project implementation.
+
+### 2.5 Privacy-First Architecture
+
+- No registration or login.
+- No permanent citizen profile creation.
+- Questionnaire responses are maintained temporarily in a session.
+- Session information expires after 30 minutes.
+- Only the information necessary for scheme matching is collected.
 
 ---
 
-## 📂 Repository Structure
+## 3. System Architecture
 
-```
-yojnasetu/
-├── backend/
-│   ├── database.py                   # SQLAlchemy 2.0 ORM, models, and auto-seeder
-│   ├── yojna_setu_ai_interactive.py   # Hybrid scheme recommender & eligibility engine
-│   └── yojnasetu_api.py              # Flask REST API, security headers, auth, static server
-├── data/
-│   ├── yojna_setu_ai_cleaned.xlsx    # Master dataset of 459 government welfare schemes
-│   └── yojnasetu.db                  # Local SQLite database (auto-generated when using SQLite)
+The application follows a frontend-backend architecture.
+
+**Frontend**
+- React.js
+- TypeScript
+- Tailwind CSS
+
+**Backend**
+- Python
+- FastAPI
+- SQLAlchemy
+
+**Database**
+- PostgreSQL
+
+**Machine Learning**
+- Scikit-learn
+- Random Forest Classifier
+- TF-IDF
+- Rule-based eligibility engine
+
+**Dataset**
+- Excel-based government scheme dataset.
+
+---
+
+## 4. Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | React.js |
+| Programming Language | TypeScript |
+| Styling | Tailwind CSS |
+| Backend | Python |
+| API Framework | FastAPI |
+| Database | PostgreSQL |
+| ORM | SQLAlchemy |
+| Machine Learning | Scikit-learn |
+| Data Processing | Pandas, NumPy |
+| ML Model | Pretrained `.pkl` model |
+| Dataset | Excel `.xlsx` |
+
+---
+
+## 5. Project Structure
+
+```text
+yojanasetu_v2/
+│
 ├── frontend/
-│   ├── index.html                    # Responsive single-page application template
-│   ├── script.js                     # Dynamic questionnaire, API client, auth & chat assistant
-│   └── styles.css                    # Custom CSS animations and government portal theme
-├── ml/
-│   ├── models/
-│   │   └── yojna_setu_ai_ml_model.pkl# Pretrained ML artifacts (Random Forest + TF-IDF)
-│   └── yojna_setu_ai_ml_model.py     # Training and evaluation pipeline for scheme classification
-├── tests/
-│   ├── test_api.py                   # Pytest suite for REST endpoints, auth, and security headers
-│   ├── test_database.py              # Pytest suite for database models, queries, and bookmarks
-│   └── test_recommender.py           # Pytest suite for eligibility rules, ML models, and scoring
-├── utils/
-│   ├── sqlite_viewer.py              # Interactive CLI browser for SQLite schemes
-│   ├── validate_project.py           # Architectural health check and system validator
-│   └── xlsx_to_sqlite.py             # Utility to export master Excel data to SQLite tables
-├── .env.example                      # Environment variables template
-├── .gitignore                        # Git ignore specifications
-├── docker-compose.yml                # Docker Compose orchestration (PostgreSQL + YojnaSetu App)
-├── Dockerfile                        # Multi-stage production container build
-├── requirements.txt                  # Pinned Python package dependencies
-├── wsgi.py                           # Production WSGI entry point (Waitress)
-└── README.md                         # Project documentation
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── stores/
+│   │   └── i18n/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── services/
+│   │   ├── models/
+│   │   └── ...
+│   │
+│   ├── data/
+│   │   └── yojna_setu_ai_cleaned.xlsx
+│   │
+│   ├── ml/
+│   │   └── yojna_setu_ai_ml_model.pkl
+│   │
+│   ├── scripts/
+│   ├── tests/
+│   └── ...
+│
+└── README.md
 ```
 
 ---
 
-## 🛠 Technology Stack
+## 6. How the System Works
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend** | HTML5, Tailwind CSS, Vanilla JavaScript (ES6+), Google Translate API |
-| **Backend Framework** | Python 3.11, Flask 3.1, Flask-CORS, Waitress WSGI Server |
-| **Machine Learning** | Scikit-Learn 1.4 (`RandomForestClassifier`, `TF-IDF`), NumPy, Pandas |
-| **Database & ORM** | PostgreSQL 16, SQLite 3, SQLAlchemy 2.0, `psycopg2-binary` |
-| **Security** | HMAC-SHA256 Tokenization, HTTP Security Headers, Parameter Sanitization |
-| **Testing** | Pytest 8.0, Pytest-Asyncio |
-| **DevOps & Containers** | Docker, Docker Compose, Alpine Linux |
+1. Citizen opens the YojnaSetu.AI platform.
+2. Citizen selects their preferred language.
+3. Citizen completes the guided questionnaire.
+4. The backend receives the questionnaire responses.
+5. The recommendation engine evaluates eligibility criteria.
+6. The ML engine analyzes scheme relevance.
+7. The system generates ranked scheme recommendations.
+8. Citizens view matching schemes and their details.
+9. Citizens can proceed to the respective official government application websites.
 
 ---
 
-## 🚀 Quick Start Guide
+## 7. Recommendation Engine
+
+The recommendation engine uses a hybrid approach.
+
+### Rule-Based Eligibility
+
+Evaluates relevant eligibility conditions, including:
+
+- Age requirements
+- Income limits
+- Gender restrictions
+- State eligibility
+- Social category
+- Occupation
+- Other scheme-specific requirements
+
+### Machine Learning
+
+Uses the pretrained ML model and text similarity techniques to support scheme matching and relevance evaluation.
+
+### Recommendation Output
+
+The system presents relevant schemes with:
+
+- Scheme relevance score
+- Eligibility information
+- Matching reasons
+- Scheme benefits
+- Application information
+
+Final eligibility and approval remain subject to the respective government department's rules.
+
+---
+
+## 8. Database and Data Management
+
+PostgreSQL is used to manage government scheme information and other required application data.
+
+The master Excel dataset acts as the source for scheme information.
+
+The application must maintain a clear separation between:
+
+**Scheme Data**
+- Government scheme details
+- Eligibility criteria
+- Benefits
+- Application information
+
+**Citizen Questionnaire Data**
+- Temporary session information
+- No permanent citizen profiles
+- Automatic session expiration after 30 minutes
+
+---
+
+## 9. Installation and Execution
 
 ### Prerequisites
 
-- **Python**: Version 3.11 or higher
-- **Git**: Installed on your system
-- *(Optional)* **Docker & Docker Compose**: For containerized deployment
+- Python
+- Node.js and npm
+- PostgreSQL
+- Git
 
-### Local Installation
+### Backend Setup
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/your-username/yojnasetu.git
-   cd yojnasetu
-   ```
-
-2. **Create and Activate a Virtual Environment**:
-   - **Windows (PowerShell)**:
-     ```powershell
-     python -m venv .venv
-     .\.venv\Scripts\Activate.ps1
-     ```
-   - **Linux / macOS**:
-     ```bash
-     python3 -m venv .venv
-     source .venv/bin/activate
-     ```
-
-3. **Install Dependencies**:
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-
-4. **Initialize Configuration**:
-   ```bash
-   # Windows
-   copy .env.example .env
-
-   # Linux / macOS
-   cp .env.example .env
-   ```
-
-### Running the Server
-
-#### Development Mode:
-```bash
-python backend/yojnasetu_api.py
-```
-
-#### Production Mode (Waitress WSGI):
-```bash
-python wsgi.py
-```
-
-Once started, open **`http://localhost:5000`** in your browser. The Flask application automatically serves both the interactive frontend UI and the REST API.
-
----
-
-## 🐳 Docker & PostgreSQL Deployment
-
-To deploy YojnaSetu with a dedicated PostgreSQL database container:
-
-1. **Start Services via Docker Compose**:
-   ```bash
-   docker compose up --build -d
-   ```
-
-2. **Verify Services**:
-   ```bash
-   docker compose ps
-   ```
-
-3. **Check Container Logs**:
-   ```bash
-   docker compose logs -f backend
-   ```
-
-4. **Access the Application**:
-   Navigate to `http://localhost:5000`. Database records are persistently stored in the `pgdata` Docker volume.
-
-5. **Stop Services**:
-   ```bash
-   docker compose down
-   ```
-
----
-
-## 📡 REST API Reference
-
-### Health & Information
-
-#### `GET /api/health`
-Returns system status, database connectivity, and ML model availability.
-
-**Response (HTTP 200)**:
-```json
-{
-  "status": "ok",
-  "database": "connected",
-  "schemes_in_db": 459,
-  "model_loaded": true,
-  "dataset_schemes_cached": 459
-}
-```
-
----
-
-### Scheme Recommendations
-
-#### `POST /api/recommend`
-Calculates personalized recommendations based on the citizen's profile.
-
-**Request Body**:
-```json
-{
-  "name": "Priya Sharma",
-  "age": 22,
-  "gender": "Female",
-  "income": 80000,
-  "occupation": "Student",
-  "state": "UP",
-  "category": "OBC",
-  "preferred_categories": ["Education & Scholarships"],
-  "limit": 10
-}
-```
-
-**Response (HTTP 200)**:
-```json
-{
-  "status": "success",
-  "count": 10,
-  "recommendations": [
-    {
-      "id": "SCHEME_042",
-      "scheme": "UP Scholarship Scheme",
-      "type": "state",
-      "scheme_type_raw": "Uttar Pradesh",
-      "category": "Education & Scholarships",
-      "desc": "Financial scholarship for post-matric students belonging to reserved and minority groups",
-      "benefit": "Tuition fee reimbursement up to ₹50,000",
-      "score": 97.0,
-      "link": "https://scholarship.up.gov.in/",
-      "minAge": 16,
-      "maxAge": 35,
-      "gender": "All",
-      "occupation": "Student",
-      "caste": "SC,ST,OBC",
-      "docs": ["Aadhaar Card", "Income Certificate", "Caste Certificate", "Marksheet"],
-      "reasons": [
-        "Meets basic eligibility criteria",
-        "Tailored for Student",
-        "Exclusive scheme for Uttar Pradesh",
-        "Special affirmative benefits for OBC"
-      ]
-    }
-  ]
-}
-```
-
----
-
-### Scheme Catalog
-
-#### `GET /api/schemes`
-Paginated search across all schemes in the database.
-
-- **Query Parameters**:
-  - `page` *(default: 1)*: Page number
-  - `limit` *(default: 20, max: 100)*: Items per page
-  - `category` *(optional)*: Filter by category (e.g., `Education`)
-  - `type` *(optional)*: Filter by type (`central`, `state`, `private`)
-  - `search` *(optional)*: Keyword search across title and description
-
-#### `GET /api/schemes/<scheme_id>`
-Fetches complete details for a single scheme by ID.
-
----
-
-### Authentication & Bookmarks
-
-#### `POST /api/auth/send-otp`
-Dispatches a 6-digit OTP to mobile or email.
-```json
-{
-  "type": "phone",
-  "identifier": "9876543210"
-}
-```
-
-#### `POST /api/auth/verify-otp`
-Validates the OTP and returns an HMAC session token.
-```json
-{
-  "type": "phone",
-  "identifier": "9876543210",
-  "otp": "123456"
-}
-```
-
-#### `GET /api/user/saved-schemes`
-*(Requires `Authorization: Bearer <token>`)*  
-Retrieves all bookmarked schemes for the authenticated user.
-
-#### `POST /api/user/saved-schemes`
-*(Requires `Authorization: Bearer <token>`)*  
-Saves a scheme to the user's account.
-
-#### `DELETE /api/user/saved-schemes/<scheme_id>`
-*(Requires `Authorization: Bearer <token>`)*  
-Removes a scheme from the user's bookmarks.
-
----
-
-## 🧠 Machine Learning & Scoring Pipeline
-
-The matching engine uses a hybrid rule-based and statistical approach:
-
-1. **Hard Eligibility Filters**:
-   - **Age Check**: User's age must fall between `Min Age` and `Max Age`.
-   - **Gender Check**: If scheme specifies a gender, user's gender must match or be `All`.
-   - **Income Check**: User's annual family income must be $\le \text{Max Income}$.
-   - **State Check**: State-specific schemes only match residents of that state; Pan-India (`Central`) and `Private` schemes match all states.
-
-2. **Composite Relevance Score (0 to 100)**:
-   - **Base Passing Score**: $+30$ points.
-   - **Age Proximity**: Up to $+15$ points based on distance from the target demographic midpoint.
-   - **Income Bracket**: Up to $+15$ points, favoring low-income / BPL brackets when applicable.
-   - **Occupation Match**: $+20$ points for exact or related employment matches (e.g. Farmer, Student, MSME vendor).
-   - **State Match**: $+10$ points for state-specific welfare matches.
-   - **Affirmative Action**: $+10$ points for caste/minority category benefits (OBC, SC, ST, EWS).
-   - **Semantic Similarity**: Up to $+10$ points using cosine similarity between user preferences and scheme description TF-IDF vectors.
-
-3. **Status Classification**:
-   - $\text{Score} \ge 80 \implies$ **Likely Eligible** (Green Badge)
-   - $60 \le \text{Score} < 80 \implies$ **Worth Checking** (Amber Badge)
-   - $\text{Score} < 60 \implies$ **Check Eligibility** (Slate Badge)
-
----
-
-## 🗄 Database Schema
-
-```mermaid
-erDiagram
-    SCHEMES {
-        int id PK
-        string scheme_id UK
-        string name
-        string provider_type
-        string scheme_type
-        string category
-        text description
-        string benefit_amount
-        int min_age
-        int max_age
-        string gender
-        string caste_category
-        int min_income
-        int max_income
-        string occupation
-        string education_required
-        text documents_required
-        string application_mode
-        string official_link
-        datetime created_at
-    }
-
-    USERS {
-        int id PK
-        string user_id UK
-        string identifier UK
-        string auth_type
-        string name
-        datetime created_at
-        datetime last_active
-    }
-
-    SAVED_SCHEMES {
-        int id PK
-        string user_id FK
-        string scheme_id
-        string scheme_name
-        string category
-        string benefit
-        string link
-        datetime saved_at
-    }
-
-    SEARCH_HISTORY {
-        int id PK
-        string user_id
-        int age
-        string gender
-        int income
-        string occupation
-        string state
-        string category
-        int recommended_count
-        datetime created_at
-    }
-
-    USERS ||--o{ SAVED_SCHEMES : "bookmarks"
-    USERS ||--o{ SEARCH_HISTORY : "searches"
-```
-
----
-
-## 🧪 Automated Testing & Validation
-
-The project includes automated test coverage with **17 unit and integration tests** built with `pytest`:
+Navigate to the backend directory.
 
 ```bash
-# Run the test suite
-pytest tests/ -v
+cd backend
 ```
 
-### System Architecture Validation
-Run the built-in system verification script to test all 12 core files, database seeding, ML inference, and API endpoints:
+Create a virtual environment:
 
 ```bash
-python utils/validate_project.py
+python -m venv venv
 ```
 
-Expected output:
+Activate it on Windows:
+
+```bash
+venv\Scripts\activate
 ```
-=================================================================
-YOJNASETU SYSTEM ARCHITECTURE VALIDATION
-=================================================================
 
-[1] CHECKING CORE DIRECTORIES & FILES...
-   ✓ Frontend Template           : index.html
-   ✓ Frontend Script             : script.js
-   ✓ Frontend CSS                : styles.css
-   ✓ Backend API                 : yojnasetu_api.py
-   ✓ Interactive Predictor       : yojna_setu_ai_interactive.py
-   ✓ SQLAlchemy Database Layer   : database.py
-   ✓ ML Training Pipeline        : yojna_setu_ai_ml_model.py
-   ✓ ML Model Artifact           : yojna_setu_ai_ml_model.pkl
-   ✓ Cleaned Scheme Dataset      : yojna_setu_ai_cleaned.xlsx
-   ✓ Production WSGI Entrypoint  : wsgi.py
-   ✓ Dockerfile                  : Dockerfile
-   ✓ Docker Compose Spec         : docker-compose.yml
+Install dependencies:
 
-[2] CHECKING DATABASE & SCHEMES REPOSITORY...
-   ✓ Schemes Table Verified: 459 schemes loaded.
+```bash
+pip install -r requirements.txt
+```
 
-[3] CHECKING ML PREDICTOR & HYBRID MATCHING...
-   ✓ ML Model & TF-IDF Vectorizer Loaded
-   ✓ Cached Schemes in Memory: 459
-   ✓ Recommendation Engine Active
+Start the FastAPI server using the project's configured application entry point.
 
-[4] CHECKING REST API & STATIC SERVING...
-   ✓ GET /api/health -> HTTP 200 OK
-   ✓ GET / (UI Static Serve) -> HTTP 200 OK
-   ✓ HTTP Security Headers Verified
+### Frontend Setup
 
-=================================================================
-ALL ARCHITECTURAL CHECKS PASSED - YOJNASETU IS HEALTHY & READY ✓
-=================================================================
+Navigate to the frontend directory.
+
+```bash
+cd frontend
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm run dev
 ```
 
 ---
 
-## ⚙️ Environment Configuration
+## 10. Testing and Validation
 
-Configuration variables can be defined in a `.env` file or exported to the system environment:
+The following areas should be verified before release:
 
-| Variable | Default Value | Description |
-| :--- | :--- | :--- |
-| `PORT` | `5000` | Port for the Flask and Waitress HTTP server |
-| `HOST` | `0.0.0.0` | Bind host address |
-| `ENV` | `development` | Environment mode (`development` or `production`) |
-| `DATABASE_URL` | `sqlite:///data/yojnasetu.db` | PostgreSQL connection string or SQLite path |
-| `SECRET_KEY` | *(Secure default provided)* | Secret key used for signing session HMAC tokens |
-| `CORS_ORIGINS` | `*` | Allowed CORS origins for API requests |
-| `MODEL_PATH` | `ml/models/yojna_setu_ai_ml_model.pkl` | *(Optional)* Custom path to pickled ML artifact |
-| `DATASET_PATH` | `data/yojna_setu_ai_cleaned.xlsx` | *(Optional)* Custom path to master schemes Excel file |
+- Frontend functionality.
+- Backend API functionality.
+- PostgreSQL connectivity.
+- Excel dataset loading.
+- ML model loading.
+- Recommendation engine accuracy.
+- Eligibility verification.
+- Multilingual functionality.
+- Session expiration.
+- Frontend-backend integration.
+- Error handling and security.
+
+Only verified test results should be reported as passed.
 
 ---
 
-## 📜 Contributing & License
+## 11. Project Objective
 
-1. Fork this repository.
-2. Create a descriptive feature branch (`git checkout -b feature/new-scheme-feed`).
-3. Commit your changes (`git commit -m 'Add state scheme feed integration'`).
-4. Ensure all Pytest tests pass (`pytest tests/`).
-5. Push to your branch and open a Pull Request.
+YojnaSetu.AI aims to make government welfare schemes easier to discover and understand.
 
-Distributed under the **MIT License**. See `LICENSE` for further details.
-#   Y o j n a S e t u  
- 
+Instead of requiring citizens to search through multiple government websites, the platform provides a single intelligent interface that connects citizens with potentially relevant schemes.
+
+**YojnaSetu.AI — The Bridge Between People and Government Schemes.**
