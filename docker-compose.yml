@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: yojnasetu_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: yojnasetu
+      POSTGRES_PASSWORD: yojnasetu_secret
+      POSTGRES_DB: yojnasetu_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U yojnasetu -d yojnasetu_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yojnasetu_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      DATABASE_URL: postgresql://yojnasetu:yojnasetu_secret@postgres:5432/yojnasetu_db
+      PORT: 5000
+      HOST: 0.0.0.0
+      SECRET_KEY: yojnasetu_super_secret_production_key_2026
+      CORS_ORIGINS: "*"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+    driver: local

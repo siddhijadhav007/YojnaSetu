@@ -1,0 +1,144 @@
+body {
+  box-sizing: border-box;
+}
+
+* {
+  font-family: 'Noto Sans', 'Poppins', system-ui, sans-serif;
+}
+
+.gradient-header {
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 50%, #66bb6a 100%);
+}
+
+.card-shadow {
+  box-shadow: 0 2px 12px rgba(46, 125, 50, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.card-hover {
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  box-shadow: 0 4px 20px rgba(46, 125, 50, 0.12), 0 2px 6px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #2e7d32 0%, #43a047 100%);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+}
+
+.progress-step {
+  transition: all 0.3s ease;
+}
+
+.ashoka-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232e7d32' fill-opacity='0.03'%3E%3Cpath d='M30 30c0-11.046-8.954-20-20-20v40c11.046 0 20-8.954 20-20zm0 0c0 11.046 8.954 20 20 20V10c-11.046 0-20 8.954-20 20z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.toast {
+  animation: toastIn 0.3s ease-out;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.spinner {
+  border: 3px solid #e5e7eb;
+  border-top: 3px solid #2e7d32;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.emblem-watermark {
+  opacity: 0.03;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+}
+
+.scheme-eligible {
+  border-left: 4px solid #059669;
+}
+
+.scheme-likely {
+  border-left: 4px solid #d97706;
+}
+
+
+.scheme-check {
+  border-left: 4px solid #6b7280;
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+/* ========== UI FIX: HEADER & SPACING ========== */
+
+/* Increase logo font size */
+#header-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+/* Fix header stacking - ensure proper z-index layering */
+header.gradient-header {
+  position: relative;
+  z-index: 100;
+}
+
+/* Official badge - positioned correctly below header */
+.bg-gradient-to-r.from-amber-600\/90 {
+  position: relative;
+  z-index: 99;
+}
+
+/* Add spacing below official badge */
+header.gradient-header + main {
+  margin-top: 1rem;
+}
+
+/* Add proper spacing to hero section */
+div#page-landing {
+  padding-top: 1rem;
+}
+
+/* Prevent overlap - ensure hero section is properly spaced */
+main.flex-1.w-full {
+  position: relative;
+  z-index: 50;
+}
